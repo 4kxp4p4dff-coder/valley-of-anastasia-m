@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Valley of Anastassiya</title>
+<style>
+body { margin:0; background: radial-gradient(circle at top, #0b1020, #000); color:white; font-family: Georgia, serif; text-align:center; }
+h1 { margin-top:30px; font-size:36px; }
+#renderCanvas { width:100%; height:420px; display:block; margin:20px 0; }
+.message { font-style:italic; font-size:18px; max-width:600px; margin:20px auto; }
+.serial { font-size:14px; opacity:0.7; margin-bottom:40px; }
+</style>
+</head>
+<body>
+
+<h1>Valley of Anastassiya</h1>
+<canvas id="renderCanvas"></canvas>
+<div class="message">“Here I left my heart forever, and only for you.”</div>
+<div class="serial">Certificate No.: PLT-290124-AM-0061</div>
+
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script>
+const canvas = document.getElementById("renderCanvas");
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+
+// Камера
+const camera = new BABYLON.ArcRotateCamera("cam", Math.PI/4, Math.PI/4, 5, BABYLON.Vector3.Zero(), scene);
+camera.attachControl(canvas, true);
+
+// Свет
+const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1,1,0), scene);
+
+// Плутон с текстурой
+const pluto = BABYLON.MeshBuilder.CreateSphere("pluto", {diameter:2, segments:64}, scene);
+const plutoMat = new BABYLON.StandardMaterial("plutoMat", scene);
+
+// Текстура Плутона
+plutoMat.diffuseTexture = new BABYLON.Texture("pluto.jpg", scene);
+pluto.material = plutoMat;
+
+// Точка Valley of Anastassiya
+const marker = BABYLON.MeshBuilder.CreateSphere("marker", {diameter:0.1}, scene);
+marker.parent = pluto; // привязка к Плутону
+
+// Позиция на поверхности Плутона
+const radius = 1.01;
+marker.position = new BABYLON.Vector3(0.6, 0.3, 0.8).normalize().scale(radius);
+
+// Яркая подсветка точки
+const markerMat = new BABYLON.StandardMaterial("markerMat", scene);
+markerMat.emissiveColor = new BABYLON.Color3(1, 0.8, 0.4); // светящийся цвет
+marker.material = markerMat;
+
+// Вращение Плутона
+scene.registerBeforeRender(function(){
+    pluto.rotation.y += 0.003;
+});
+
+// Рендер
+engine.runRenderLoop(function(){
+    scene.render();
+});
+
+// Подстраиваем размер окна
+window.addEventListener("resize", function(){
+    engine.resize();
+});
+</script>
+
+</body>
+</html>
